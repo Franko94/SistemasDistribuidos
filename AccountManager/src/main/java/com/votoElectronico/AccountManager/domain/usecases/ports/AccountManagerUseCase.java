@@ -14,4 +14,8 @@ public class AccountManagerUseCase {
         return accountManagerDataProvider.checkValidUser(login);
     }
 
+    public MessageRS insertUser(LoginRQ login){
+        return accountManagerDataProvider.insertUser(login);
+    }
+
 }

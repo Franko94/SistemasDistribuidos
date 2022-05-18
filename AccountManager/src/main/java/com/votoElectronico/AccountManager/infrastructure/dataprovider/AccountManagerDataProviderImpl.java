@@ -24,4 +24,17 @@ public class AccountManagerDataProviderImpl implements AccountManagerDataProvide
         }
         return messageRS;
     }
+
+    @Override
+    public MessageRS insertUser(LoginRQ loginRQ){
+        MessageRS messageRS = MessageRS.builder().build();
+        if(Objects.nonNull(loginService.getUser(loginRQ))){
+            messageRS.setMensaje("usuario ya existe");
+        }
+        else {
+            loginService.insertUSer(loginRQ);
+            messageRS.setMensaje("Insertado OK");
+        }
+        return messageRS;
+    }
 }

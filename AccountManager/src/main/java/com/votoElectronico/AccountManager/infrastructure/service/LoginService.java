@@ -13,4 +13,8 @@ public class LoginService {
     public LoginRQ getUser(LoginRQ loginRQ){
         return loginRepository.findLoginRQByUsuario(loginRQ.getUsuario());
     }
+
+    public LoginRQ insertUSer(LoginRQ loginRQ){
+        return loginRepository.save(loginRQ);
+    }
 }

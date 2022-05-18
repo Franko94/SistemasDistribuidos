@@ -20,5 +20,8 @@ public class LoginController {
         return accountManagerUseCase.checkValidUser(login);
     }
 
-
+    @PostMapping("/insertUser")
+    public MessageRS insertUser(@RequestBody LoginRQ login){
+        return accountManagerUseCase.insertUser(login);
+    }
 }
