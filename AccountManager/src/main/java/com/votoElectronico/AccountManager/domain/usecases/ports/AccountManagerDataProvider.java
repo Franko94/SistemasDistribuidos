@@ -6,4 +6,6 @@ import com.votoElectronico.AccountManager.domain.entities.response.MessageRS;
 public interface AccountManagerDataProvider {
     MessageRS checkValidUser(LoginRQ login);
     MessageRS insertUser(LoginRQ login);
+
+    MessageRS validateToken(String token);
 }

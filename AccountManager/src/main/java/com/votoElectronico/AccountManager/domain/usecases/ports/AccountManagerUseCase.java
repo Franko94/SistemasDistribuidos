@@ -18,4 +18,8 @@ public class AccountManagerUseCase {
         return accountManagerDataProvider.insertUser(login);
     }
 
+    public MessageRS validateToken(String token){
+        return accountManagerDataProvider.validateToken(token);
+    }
+
 }

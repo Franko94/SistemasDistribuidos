@@ -9,15 +9,15 @@ import com.votoElectronico.AccountManager.infrastructure.service.LoginService;
 import com.votoElectronico.AccountManager.infrastructure.service.SessionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.Objects;
-import java.util.Optional;
 
 @Component
 public class AccountManagerDataProviderImpl implements AccountManagerDataProvider {
 
+    public static final String URL_VOTO = "http://165.232.132.36/session";
     private LoginService loginService;
     private SessionService sessionService;
     @Autowired
@@ -26,24 +26,29 @@ public class AccountManagerDataProviderImpl implements AccountManagerDataProvide
         this.sessionService = sessionService;
     }
     @Override
-    public MessageRS checkValidUser(LoginRQ loginRQ){
+    public MessageRS checkValidUser(LoginRQ loginRQ) {
         LoginRQ login = loginService.getUser(loginRQ);
         MessageRS messageRS = MessageRS.builder().mensaje("no existe").build();
-        if(Objects.nonNull(login)){
+        Session session;
+        if (Objects.nonNull(login)) {
             messageRS.setMensaje("existe");
-            createSession(loginRQ.getUsuario());
-            allowToVote();
+            session = createSession(loginRQ.getUsuario());
+            messageRS.setMensaje(allowToVote(session));
         }
         return messageRS;
     }
 
-    private void createSession(String usuario){
+    private Session createSession(String usuario){
         Session session = Session.builder().usuario(usuario).token(Utils.createToken()).fecha(LocalDateTime.now()).build();
         sessionService.insertSession(session);
+        return  session;
     }
 
-    private void allowToVote(){ //Llamar al endpoint de anita
-
+    private String allowToVote(Session session){ //Llamar al endpoint de anita
+        final String uri = URL_VOTO;
+        RestTemplate restTemplate = new RestTemplate();
+        return restTemplate.postForObject(uri, session,String.class);
+        //String result = restTemplate.getForObject(uri, String.class);
     }
 
     @Override
@@ -55,6 +60,19 @@ public class AccountManagerDataProviderImpl implements AccountManagerDataProvide
         else {
             loginService.insertUSer(loginRQ);
             messageRS.setMensaje("Insertado OK");
+        }
+        return messageRS;
+    }
+
+    @Override
+    public MessageRS validateToken(String token){
+        String validToken =sessionService.getValidToken(token);
+        MessageRS messageRS = MessageRS.builder().build();
+        if(Objects.isNull(validToken)){
+            messageRS.setMensaje("Invalido");
+        }
+        else{
+            messageRS.setMensaje("Valido");
         }
         return messageRS;
     }
