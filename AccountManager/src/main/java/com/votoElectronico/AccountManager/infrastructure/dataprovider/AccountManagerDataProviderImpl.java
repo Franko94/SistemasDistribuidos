@@ -5,14 +5,18 @@ import com.votoElectronico.AccountManager.domain.entities.request.LoginRQ;
 import com.votoElectronico.AccountManager.domain.entities.response.MessageRS;
 import com.votoElectronico.AccountManager.domain.usecases.ports.AccountManagerDataProvider;
 import com.votoElectronico.AccountManager.infrastructure.configuration.Utils.Utils;
+import com.votoElectronico.AccountManager.infrastructure.exception.UserNotFoundException;
 import com.votoElectronico.AccountManager.infrastructure.service.LoginService;
 import com.votoElectronico.AccountManager.infrastructure.service.SessionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Component
 public class AccountManagerDataProviderImpl implements AccountManagerDataProvider {
@@ -26,16 +30,18 @@ public class AccountManagerDataProviderImpl implements AccountManagerDataProvide
         this.sessionService = sessionService;
     }
     @Override
-    public MessageRS checkValidUser(LoginRQ loginRQ) {
+    public Session checkValidUser(LoginRQ loginRQ) {
         LoginRQ login = loginService.getUser(loginRQ);
-        MessageRS messageRS = MessageRS.builder().mensaje("no existe").build();
-        Session session;
+        AtomicReference<Session> session = new AtomicReference<>(Session.builder().build());
+
+        Optional.ofNullable(login)
+                .orElseThrow(() -> new UserNotFoundException("usuario no valido"));
+
         if (Objects.nonNull(login)) {
-            messageRS.setMensaje("existe");
-            session = createSession(loginRQ.getUsuario());
-            messageRS.setMensaje(allowToVote(session));
+            session.set(createSession(loginRQ.getUserName()));
+           // messageRS.setMensaje(allowToVote(session));
         }
-        return messageRS;
+        return session.get();
     }
 
     private Session createSession(String usuario){
@@ -52,12 +58,13 @@ public class AccountManagerDataProviderImpl implements AccountManagerDataProvide
     }
 
     @Override
-    public MessageRS insertUser(LoginRQ loginRQ){
+    public MessageRS insertUser(LoginRQ loginRQ) throws NoSuchAlgorithmException {
         MessageRS messageRS = MessageRS.builder().build();
         if(Objects.nonNull(loginService.getUser(loginRQ))){
             messageRS.setMensaje("usuario ya existe");
         }
         else {
+            loginRQ.setPassword(Utils.hashPassword(loginRQ.getPassword()));
             loginService.insertUSer(loginRQ);
             messageRS.setMensaje("Insertado OK");
         }
@@ -68,6 +75,8 @@ public class AccountManagerDataProviderImpl implements AccountManagerDataProvide
     public MessageRS validateToken(String token){
         String validToken =sessionService.getValidToken(token);
         MessageRS messageRS = MessageRS.builder().build();
+        Optional.ofNullable(validToken)
+                .orElseThrow(()-> new UserNotFoundException("Token invalido"));
         if(Objects.isNull(validToken)){
             messageRS.setMensaje("Invalido");
         }

@@ -18,6 +18,6 @@ import java.io.Serializable;
 @Table(name="usuarios")
 public class LoginRQ implements Serializable {
     @Id
-    private  String usuario;
-    private  String contrasenia;
+    private  String userName;
+    private  String password;
 }

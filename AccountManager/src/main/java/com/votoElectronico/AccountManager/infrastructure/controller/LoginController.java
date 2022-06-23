@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.security.NoSuchAlgorithmException;
+
 @RestController
 public class LoginController {
 
@@ -17,13 +19,13 @@ public class LoginController {
         this.accountManagerUseCase = accountManagerUseCase;
     }
 
-    @PostMapping("/checkUser")
-    public MessageRS chequearUsuario(@RequestBody LoginRQ login){
+    @PostMapping("/authenticateUser")
+    public Session authenticateUser(@RequestBody LoginRQ login){
         return accountManagerUseCase.checkValidUser(login);
     }
 
     @PostMapping("/insertUser")
-    public MessageRS insertUser(@RequestBody LoginRQ login){
+    public MessageRS insertUser(@RequestBody LoginRQ login) throws NoSuchAlgorithmException {
         return accountManagerUseCase.insertUser(login);
     }
 

@@ -1,6 +1,5 @@
 package com.votoElectronico.AccountManager.infrastructure.service;
 
-import com.votoElectronico.AccountManager.domain.entities.common.Session;
 import com.votoElectronico.AccountManager.domain.entities.request.LoginRQ;
 import com.votoElectronico.AccountManager.infrastructure.repository.LoginRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +11,7 @@ public class LoginService {
     private LoginRepository loginRepository;
 
     public LoginRQ getUser(LoginRQ loginRQ){
-        return loginRepository.findLoginRQByUsuario(loginRQ.getUsuario());
+        return loginRepository.findLoginRQByUserName(loginRQ.getUserName());
     }
 
     public LoginRQ insertUSer(LoginRQ loginRQ){

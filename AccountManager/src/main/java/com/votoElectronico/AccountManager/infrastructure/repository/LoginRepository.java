@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface LoginRepository extends JpaRepository<LoginRQ,Integer> {
 
-    LoginRQ findLoginRQByUsuario(String usuario);
+    LoginRQ findLoginRQByUserName(String user);
 }

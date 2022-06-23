@@ -1,7 +1,10 @@
 package com.votoElectronico.AccountManager.domain.usecases.ports;
 
+import com.votoElectronico.AccountManager.domain.entities.common.Session;
 import com.votoElectronico.AccountManager.domain.entities.request.LoginRQ;
 import com.votoElectronico.AccountManager.domain.entities.response.MessageRS;
+
+import java.security.NoSuchAlgorithmException;
 
 public class AccountManagerUseCase {
     private final AccountManagerDataProvider accountManagerDataProvider;
@@ -10,11 +13,11 @@ public class AccountManagerUseCase {
         this.accountManagerDataProvider = accountManagerDataProvider;
     }
 
-    public MessageRS checkValidUser(LoginRQ login){
+    public Session checkValidUser(LoginRQ login){
         return accountManagerDataProvider.checkValidUser(login);
     }
 
-    public MessageRS insertUser(LoginRQ login){
+    public MessageRS insertUser(LoginRQ login) throws NoSuchAlgorithmException {
         return accountManagerDataProvider.insertUser(login);
     }
 
